@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject>USAddress.Driver.Program</StartupObject>
+    <Company />
+    <Authors>Jim Counts</Authors>
+    <Copyright>Copyright © Jim Counts 2011</Copyright>
+    <Description>Command line shell for AddressParser</Description>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RootNamespace>USAddress.Driver</RootNamespace>
+  </PropertyGroup>
+</Project>
