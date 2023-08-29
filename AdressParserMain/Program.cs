@@ -1,37 +1,65 @@
-﻿using System.Resources;
-using System.Runtime.ConstrainedExecution;
-using AddressParserLib;
+﻿using System;
+using System.Text.RegularExpressions;
 
-var parserUsa = AddressParser.Default;
-bool loop;
-
-do
+namespace AddressEstimation
 {
-    Console.WriteLine("Please enter your adress");
-    var input = Console.ReadLine();
-
-    var result = parserUsa.ParseAddress(input);
-    if (result == null)
-    {  
-        Console.WriteLine("Resources.ErrorNotParsable");
-    }
-    
-    else
+    class Program
     {
-        var properties = result
-            .GetType()
-            .GetProperties()
-            .OrderBy(x => x.Name);
-        foreach (var property in properties)
+        static void Main(string[] args)
         {
-            Console.WriteLine(
-                "{0,30} : {1}",
-                property.Name,
-                property.GetValue(result, null));
+            string addressInput = GetUserInput("Enter an address: ");
+            Address parsedAddress = ParseAddress(addressInput);
+
+            if (parsedAddress != null)
+            {
+                Console.WriteLine("Parsed Address:");
+                Console.WriteLine($"Street: {parsedAddress.Street}");
+                Console.WriteLine($"City: {parsedAddress.City}");
+                Console.WriteLine($"Province: {parsedAddress.Province}");
+                Console.WriteLine($"Postal Code: {parsedAddress.PostalCode}");
+            }
+            else
+            {
+                Console.WriteLine("Invalid address format.");
+            }
+        }
+
+        static Address ParseAddress(string address)
+        {
+            string pattern = @"^(?<Street>.*),\s*(?<City>.*),\s*(?<Province>.*),\s*(?<PostalCode>.*)$";
+
+            Match match = Regex.Match(address, pattern);
+
+            if (match.Success)
+            {
+                Address parsedAddress = new Address
+                {
+                    Street = match.Groups["Street"].Value.Trim(),
+                    City = match.Groups["City"].Value.Trim(),
+                    Province = match.Groups["Province"].Value.Trim(),
+                    PostalCode = match.Groups["PostalCode"].Value.Trim()
+                };
+
+                return parsedAddress;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        static string GetUserInput(string prompt)
+        {
+            Console.Write(prompt);
+            return Console.ReadLine();
         }
     }
 
-    var readLine = Console.ReadLine() ?? string.Empty;
-    loop = readLine.ToUpperInvariant() == "Y";
+    class Address
+    {
+        public string Street { get; set; }
+        public string City { get; set; }
+        public string Province { get; set; }
+        public string PostalCode { get; set; }
+    }
 }
-while (loop);

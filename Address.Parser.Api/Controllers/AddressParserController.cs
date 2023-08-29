@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AddressParserLib;
-using System.Linq;
 using Address.Parser.Api.Models;
 using Address.Parser.Api.Helpers;
 
@@ -8,38 +7,46 @@ namespace AddressParserAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AddressController : ControllerBase
+    public class AddressApiController : ControllerBase
     {
-        [HttpPost("_parse")]
+        private readonly AddressParser _parserUsa = AddressParser.Default;
+        private readonly AddressParserCanada _parserCanada = AddressParserCanada.Default;
+
+        [HttpPost("parse")]
         public IActionResult ParseAddress([FromBody] AddressToParseDto addressToParseDto)
         {
-            var parserUsa = AddressParser.Default;
-            var result = parserUsa.ParseAddress(addressToParseDto.Address, true);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid input data.");
+            }
+
+            var result = _parserUsa.ParseAddress(addressToParseDto.Address, true);
 
             if (result == null)
             {
-                return BadRequest("Error: Address could not be parsed.");
+                return BadRequest("Error: USA Address could not be parsed.");
             }
-            var addressResult = result.Map();
- 
 
+            var addressResult = result.Map();
             return Ok(addressResult);
         }
 
-
-        // Nouvel endpoint pour les adresses canadiennes
-        [HttpPost("_parseCanada")] 
+        [HttpPost("parseCanada")]
         public IActionResult ParseCanadaAddress([FromBody] AddressToParseDto addressToParseDto)
         {
-            var parserCanada = AddressParserCanada.Default; // Assumer que vous avez un AddressParserCanada défini
-            var result = parserCanada.ParseAddress(addressToParseDto.Address, true);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid input data.");
+            }
+
+            var result = _parserCanada.ParseAddress(addressToParseDto.Address, true);
 
             if (result == null)
             {
                 return BadRequest("Error: Canadian address could not be parsed.");
             }
-            var addressResult = result.Map();
 
+            var addressResult = result.Map();
             return Ok(addressResult);
         }
     }
